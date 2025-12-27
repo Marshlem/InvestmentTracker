@@ -1,0 +1,12 @@
+namespace InvestmentTracker.API.Models;
+
+public class AssetCategory
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = default!;
+
+    public bool IsActive { get; set; } = true;
+
+    public List<Asset> Assets { get; set; } = new();
+}

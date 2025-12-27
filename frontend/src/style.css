@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+/* GLOBAL STYLES */
+@layer base {
+  :root {
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: dark;
+    color: #e0e0e0;
+    background-color: #1e1e1e;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* --- BASIC TAGS --- */
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 1280px;
+    padding: 2rem;
+  }
+
+  h1, h2, h3, h4, h5 {
+    color: #f0f0f0;
+    font-weight: 600;
+  }
+
+  a {
+    color: #8ab4f8;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #aecbfa;
+  }
+
+  /* --- BUTTONS --- */
+  button {
+    border-radius: 8px;
+    border: 1px solid #555;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+
+  button:hover {
+    background-color: #3a3a3a;
+    border-color: #777;
+  }
+
+  button:focus {
+    outline: 2px solid #646cff;
+    outline-offset: 2px;
+  }
+
+  /* --- FORM ELEMENTS --- */
+  input,
+  select,
+  textarea {
+    background-color: #2b2b2b;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 0.5em 0.75em;
+    width: 100%;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: #646cff;
+    background-color: #333;
+  }
+
+  option {
+    background-color: #2b2b2b;
+    color: #e0e0e0;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  label {
+    color: #b0b0b0;
+  }
+
+  /* --- TABLES --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+  }
+
+  th,
+  td {
+    padding: 0.75em 1em;
+    border-bottom: 1px solid #333;
+  }
+
+  th {
+    background-color: #2a2a2a;
+    color: #ccc;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  tr:hover {
+    background-color: #2f2f2f;
+  }
+
+  /* --- CARD / PANEL STYLES --- */
+  .card {
+    background-color: #242424;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: #e0e0e0;
+  }
+
+  /* --- SCROLLBAR DARK MODE --- */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #666;
+  }
+
+  /* --- MEDIA --- */
+  @media (max-width: 640px) {
+    #app {
+      padding: 1rem;
+    }
+  }
+}

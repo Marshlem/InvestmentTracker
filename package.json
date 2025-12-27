@@ -1,0 +1,13 @@
+{
+  "name": "investmentapp",
+  "version": "1.0.0",
+  "private": true,
+"scripts": {
+  "dev": "concurrently -n API,WEB -c auto \"cd InvestmentTracker.API && dotnet watch run --urls http://localhost:5147\" \"cd frontend && npm run dev\"",
+  "dev:api": "cd InvestmentTracker.API && dotnet watch run --urls http://localhost:5147",
+  "dev:web": "cd frontend && npm run dev"
+},
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

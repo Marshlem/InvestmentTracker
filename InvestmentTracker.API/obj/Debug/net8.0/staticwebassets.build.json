@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "9qlS9AdpJ+QGcYvZu3CMmZHHDT8xjgBVw98fTUnoLsw=",
+  "Source": "InvestmentTracker.API",
+  "BasePath": "_content/InvestmentTracker.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
