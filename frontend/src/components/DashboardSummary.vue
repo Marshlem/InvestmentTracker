@@ -1,5 +1,5 @@
 <template>
-  <div class="grid gap-4 md:grid-cols-3">
+  <div class="grid gap-4 md:grid-cols-4">
     <div class="rounded-xl border p-4">
       <div class="text-sm opacity-70">Total Invested</div>
       <div class="text-2xl font-semibold">
@@ -11,6 +11,13 @@
       <div class="text-sm opacity-70">Current Value</div>
       <div class="text-2xl font-semibold">
         {{ currency(summary.currentValue) }}
+      </div>
+    </div>
+
+        <div class="rounded-xl border p-4">
+      <div class="text-sm opacity-70">Total Dividends</div>
+      <div class="text-2xl font-semibold">
+        {{ currency(summary.totalDividends) }}
       </div>
     </div>
 
