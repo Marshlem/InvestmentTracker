@@ -1,12 +1,19 @@
 public sealed class DashboardChartResponse
 {
-    public required List<DashboardChartRowDto> Series { get; set; }
+    public List<PortfolioValueChartRow> PortfolioValue { get; set; } = [];
+    public List<ProfitLossChartRow> ProfitLoss { get; set; } = [];
 }
 
-public sealed class DashboardChartRowDto
+public sealed class PortfolioValueChartRow
 {
-    public required string Period { get; set; } 
-    public decimal Invested { get; set; }
+    public string Period { get; set; } = default!;
+    public decimal InvestedAccumulated { get; set; }
     public decimal CurrentValue { get; set; }
-    public decimal ProfitLoss { get; set; }
+}
+
+public sealed class ProfitLossChartRow
+{
+    public string Period { get; set; } = default!;
+    public decimal PeriodProfitLoss { get; set; }
+    public decimal AccumulatedProfitLoss { get; set; }
 }

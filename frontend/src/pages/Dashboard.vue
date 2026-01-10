@@ -13,10 +13,7 @@
     />
 
     <!-- CHART -->
-    <DashboardChart
-      v-if="filters"
-      :filters="filters"
-    />
+    <DashboardChart :filters="filters" />
   </section>
 </template>
 

@@ -50,18 +50,16 @@ defineProps({ assets: Array })
 const emit = defineEmits(['apply'])
 
 const local = reactive({
-  dateFrom: new Date(new Date().setMonth(new Date().getMonth() - 6))
-    .toISOString()
-    .slice(0, 10),
-  dateTo: new Date().toISOString().slice(0, 10),
+  dateFrom: null,
+  dateTo: null,
   groupBy: 'month',
   assetId: null
 })
 
 function apply() {
   emit('apply', {
-    dateFrom: local.dateFrom,
-    dateTo: local.dateTo,
+    dateFrom: local.dateFrom || null,
+    dateTo: local.dateTo || null,
     groupBy: local.groupBy,
     assetIds: local.assetId ? [local.assetId] : null
   })
