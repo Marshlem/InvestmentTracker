@@ -11,3 +11,9 @@ export function getDashboardChart(payload) {
     .post('/dashboard/chart', payload)
     .then(r => r.data)
 }
+
+export function getInvestmentTable() {
+  return api
+    .get('/dashboard/investment-table')
+    .then(r => r.data)
+}

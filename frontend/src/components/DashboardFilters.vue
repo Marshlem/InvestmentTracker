@@ -1,46 +1,68 @@
 <template>
-  <div class="flex flex-wrap gap-3 items-end">
-    <div>
-      <label>From</label>
-      <input type="date" v-model="local.dateFrom" />
+  <div class="flex items-end gap-4 flex-wrap">
+
+    <!-- From -->
+    <div class="flex flex-col">
+      <label class="text-sm">From</label>
+      <input
+        type="date"
+        v-model="local.dateFrom"
+        class="border rounded px-2 py-1"
+      />
     </div>
 
-    <div>
-      <label>To</label>
-      <input type="date" v-model="local.dateTo" />
+    <!-- To -->
+    <div class="flex flex-col">
+      <label class="text-sm">To</label>
+      <input
+        type="date"
+        v-model="local.dateTo"
+        class="border rounded px-2 py-1"
+      />
     </div>
 
-    <div>
-      <label>Group by</label>
-      <select v-model="local.groupBy">
+    <!-- Group by -->
+    <div class="flex flex-col">
+      <label class="text-sm">Group by</label>
+      <select
+        v-model="local.groupBy"
+        class="border rounded px-2 py-1"
+      >
         <option value="month">Month</option>
         <option value="quarter">Quarter</option>
         <option value="year">Year</option>
       </select>
     </div>
 
-    <div class="grid gap-1 min-w-[220px]">
-    <label class="text-sm">Asset</label>
-    <select
+    <!-- Asset -->
+    <div class="flex flex-col min-w-[220px]">
+      <label class="text-sm">Asset</label>
+      <select
         v-model="local.assetId"
         class="border rounded px-2 py-1"
-    >
+      >
         <option :value="null">All assets</option>
         <option
-        v-for="a in assets"
-        :key="a.id"
-        :value="a.id"
+          v-for="a in assets"
+          :key="a.id"
+          :value="a.id"
         >
-        {{ a.name }}
+          {{ a.name }}
         </option>
-    </select>
+      </select>
     </div>
 
-    <button class="border px-3 py-2" @click="apply">
+    <!-- Apply -->
+    <button
+      class="border px-4 py-2 rounded h-[38px]"
+      @click="apply"
+    >
       Apply
     </button>
+
   </div>
 </template>
+
 
 <script setup>
 import { reactive } from 'vue'

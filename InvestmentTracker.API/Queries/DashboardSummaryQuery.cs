@@ -158,4 +158,168 @@ public class DashboardSummaryQuery
             ProfitLoss = profitLoss
         };
     }
+
+    public async Task<DashboardInvestmentTableResponse> GetInvestmentTable()
+    {
+        var tx = _db.Transactions
+            .AsNoTracking()
+            .AsQueryable();
+
+        // -------------------------
+        // Datos ribos
+        // -------------------------
+        var now = DateTime.UtcNow;
+        var thisMonthStart = new DateTime(now.Year, now.Month, 1);
+        var prevMonthEnd = thisMonthStart.AddDays(-1);
+        var prevMonthStart = new DateTime(prevMonthEnd.Year, prevMonthEnd.Month, 1);
+
+        // -------------------------
+        // Praeito mėnesio paskutinė CurrentValue (per asset)
+        // -------------------------
+        var prevMonthValues = await _db.Transactions
+            .AsNoTracking()
+            .Where(t => t.Date >= prevMonthStart && t.Date <= prevMonthEnd)
+            .GroupBy(t => t.AssetId)
+            .Select(g => new
+            {
+                AssetId = g.Key,
+                Value = g
+                    .OrderByDescending(x => x.Date)
+                    .Select(x => x.CurrentValue)
+                    .FirstOrDefault()
+            })
+            .ToDictionaryAsync(x => x.AssetId, x => x.Value);
+
+        // -------------------------
+        // Einamo mėnesio dividendai (per asset)
+        // -------------------------
+        var thisMonthDividends = await _db.Transactions
+            .AsNoTracking()
+            .Where(t => t.Date >= thisMonthStart)
+            .GroupBy(t => t.AssetId)
+            .Select(g => new
+            {
+                AssetId = g.Key,
+                Dividends = g.Sum(x => (decimal?)x.Dividend) ?? 0
+            })
+            .ToDictionaryAsync(x => x.AssetId, x => x.Dividends);
+
+        // -------------------------
+        // Pagrindinė agregacija per asset
+        // -------------------------
+        var perAsset = await (
+            from t in tx
+            join a in _db.Assets.AsNoTracking()
+                on t.AssetId equals a.Id
+            group t by new { t.AssetId, a.Name } into g
+            select new
+            {
+                AssetId = g.Key.AssetId,
+                Name = g.Key.Name,
+
+                TotalInvested = g
+                    .Where(x => x.ValueChange > 0)
+                    .Sum(x => (decimal?)x.ValueChange) ?? 0,
+
+                TotalWithdrawn = g
+                    .Where(x => x.ValueChange < 0)
+                    .Sum(x => (decimal?)x.ValueChange) ?? 0,
+
+                TotalDividends = g.Sum(x => (decimal?)x.Dividend) ?? 0,
+
+                LatestValue = g
+                    .OrderByDescending(x => x.Date)
+                    .Select(x => x.CurrentValue)
+                    .FirstOrDefault()
+            }
+        ).ToListAsync();
+
+        var portfolioTotalInvested = perAsset.Sum(x => x.TotalInvested);
+
+        // -------------------------
+        // Formuojam eilutes
+        // -------------------------
+        var rows = perAsset.Select(x =>
+        {
+            var gainLoss =
+                x.LatestValue
+                - x.TotalInvested
+                + x.TotalWithdrawn
+                + x.TotalDividends;
+
+            var prevValue = prevMonthValues.TryGetValue(x.AssetId, out var pv)
+                ? pv
+                : 0;
+
+            var dividendsThisMonth = thisMonthDividends.TryGetValue(x.AssetId, out var d)
+                ? d
+                : 0;
+
+            var gainLossLastMonth =
+                prevValue == 0
+                    ? 0
+                    : (x.LatestValue + dividendsThisMonth) - prevValue;
+
+            var gainLossLastMonthPercent =
+                prevValue == 0
+                    ? 0
+                    : gainLossLastMonth / prevValue * 100;
+
+            return new DashboardInvestmentTableRow
+            {
+                Investment = x.Name,
+                TotalInvested = x.TotalInvested,
+                TotalValue = x.LatestValue,
+                TotalDividends = x.TotalDividends,
+
+                GainLoss = gainLoss,
+                GainLossPercent = x.TotalInvested == 0
+                    ? 0
+                    : gainLoss / x.TotalInvested * 100,
+
+                GainLossLastMonth = gainLossLastMonth,
+                GainLossLastMonthPercent = gainLossLastMonthPercent,
+
+                InvestedPortfolioPercent = portfolioTotalInvested == 0
+                    ? 0
+                    : x.TotalInvested / portfolioTotalInvested * 100
+            };
+        }).ToList();
+
+        // -------------------------
+        // TOTAL
+        // -------------------------
+        var totalInvested = rows.Sum(x => x.TotalInvested);
+        var totalGainLoss = rows.Sum(x => x.GainLoss);
+        var totalGainLossLastMonth = rows.Sum(x => x.GainLossLastMonth);
+        var portfolioValuePrevMonth = prevMonthValues.Values.Sum();
+
+        var total = new DashboardInvestmentTableTotal
+        {
+            TotalInvested = totalInvested,
+            TotalValue = rows.Sum(x => x.TotalValue),
+            TotalDividends = rows.Sum(x => x.TotalDividends),
+
+            GainLoss = totalGainLoss,
+
+            GainLossPercent = totalInvested == 0
+                ? 0
+                : totalGainLoss / totalInvested * 100,
+
+            GainLossLastMonth = totalGainLossLastMonth,
+
+            GainLossLastMonthPercent =
+                portfolioValuePrevMonth == 0
+                    ? 0
+                    : totalGainLossLastMonth / portfolioValuePrevMonth * 100,
+
+            InvestedPortfolioPercent = 100
+        };
+
+        return new DashboardInvestmentTableResponse
+        {
+            Rows = rows,
+            Total = total
+        };
+    }
 }

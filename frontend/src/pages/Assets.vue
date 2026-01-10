@@ -1,5 +1,5 @@
 <template>
-  <section class="p-6 space-y-4 text-gray-100">
+  <section class="p-6 space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-semibold">Assets</h1>

@@ -24,4 +24,10 @@ public sealed class DashboardController : ControllerBase
     {
         return Ok(await _query.GetChart(request));
     }
+
+    [HttpGet("investment-table")]
+    public async Task<ActionResult<DashboardInvestmentTableResponse>> GetInvestmentTable()
+    {
+        return Ok(await _query.GetInvestmentTable());
+    }
 }
