@@ -9,4 +9,6 @@ public class AssetCategory
     public bool IsActive { get; set; } = true;
 
     public List<Asset> Assets { get; set; } = new();
+    public int UserId { get; set; }
+    public User User { get; set; } = default!;
 }

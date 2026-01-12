@@ -10,4 +10,6 @@ public class Transaction
     public decimal CurrentValue { get; set; }
     public decimal Dividend { get; set; }
     public string? Notes { get; set; }
+    public int UserId { get; set; }
+    public User User { get; set; } = default!;
 }

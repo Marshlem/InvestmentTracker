@@ -144,3 +144,4 @@ C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\obj\Debug\n
 C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\obj\Debug\net8.0\InvestmentTracker.API.genruntimeconfig.cache
 C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\obj\Debug\net8.0\ref\InvestmentTracker.API.dll
 C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\obj\Debug\net8.0\InvestmentTracker.API.sourcelink.json
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\BCrypt.Net-Next.dll

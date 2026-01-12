@@ -11,9 +11,14 @@ public class DashboardSummaryQuery
         _db = db;
     }
 
-    public async Task<DashboardSummaryDto> ExecuteAsync(DateTime date)
+    // =========================
+    // SUMMARY
+    // =========================
+    public async Task<DashboardSummaryDto> ExecuteAsync(int userId, DateTime date)
     {
-        var tx = _db.Transactions.Where(t => t.Date <= date);
+        var tx = _db.Transactions
+            .AsNoTracking()
+            .Where(t => t.UserId == userId && t.Date <= date);
 
         var invested = await tx
             .Where(t => t.ValueChange > 0)
@@ -39,7 +44,10 @@ public class DashboardSummaryQuery
         };
     }
 
-    public async Task<DashboardChartResponse> GetChart(DashboardChartRequest req)
+    // =========================
+    // CHART
+    // =========================
+    public async Task<DashboardChartResponse> GetChart(int userId, DashboardChartRequest req)
     {
         var groupBy = string.IsNullOrWhiteSpace(req.GroupBy)
             ? "month"
@@ -47,6 +55,7 @@ public class DashboardSummaryQuery
 
         var tx = _db.Transactions
             .AsNoTracking()
+            .Where(t => t.UserId == userId)
             .AsQueryable();
 
         if (req.DateFrom.HasValue)
@@ -58,7 +67,7 @@ public class DashboardSummaryQuery
         if (req.AssetIds is { Count: > 0 })
             tx = tx.Where(t => req.AssetIds.Contains(t.AssetId));
 
-        // 1. Grupavimas: Period + Asset (kaip ir buvo)
+        // 1. Grupavimas: Period + Asset
         var perAsset = await tx
             .GroupBy(t => new
             {
@@ -90,7 +99,7 @@ public class DashboardSummaryQuery
             })
             .ToListAsync();
 
-        // 2. Grupavimas tik pagal periodą (bazinė serija abiem grafikams)
+        // 2. Grupavimas tik pagal periodą
         var perPeriod = perAsset
             .GroupBy(x => new { x.Year, x.PeriodIndex })
             .OrderBy(g => g.Key.Year)
@@ -159,26 +168,29 @@ public class DashboardSummaryQuery
         };
     }
 
-    public async Task<DashboardInvestmentTableResponse> GetInvestmentTable()
+    // =========================
+    // INVESTMENT TABLE
+    // =========================
+    public async Task<DashboardInvestmentTableResponse> GetInvestmentTable(int userId)
     {
         var tx = _db.Transactions
             .AsNoTracking()
+            .Where(t => t.UserId == userId)
             .AsQueryable();
 
-        // -------------------------
         // Datos ribos
-        // -------------------------
         var now = DateTime.UtcNow;
         var thisMonthStart = new DateTime(now.Year, now.Month, 1);
         var prevMonthEnd = thisMonthStart.AddDays(-1);
         var prevMonthStart = new DateTime(prevMonthEnd.Year, prevMonthEnd.Month, 1);
 
-        // -------------------------
-        // Praeito mėnesio paskutinė CurrentValue (per asset)
-        // -------------------------
+        // Praeito mėnesio paskutinė CurrentValue
         var prevMonthValues = await _db.Transactions
             .AsNoTracking()
-            .Where(t => t.Date >= prevMonthStart && t.Date <= prevMonthEnd)
+            .Where(t =>
+                t.UserId == userId &&
+                t.Date >= prevMonthStart &&
+                t.Date <= prevMonthEnd)
             .GroupBy(t => t.AssetId)
             .Select(g => new
             {
@@ -190,12 +202,12 @@ public class DashboardSummaryQuery
             })
             .ToDictionaryAsync(x => x.AssetId, x => x.Value);
 
-        // -------------------------
-        // Einamo mėnesio dividendai (per asset)
-        // -------------------------
+        // Einamo mėnesio dividendai
         var thisMonthDividends = await _db.Transactions
             .AsNoTracking()
-            .Where(t => t.Date >= thisMonthStart)
+            .Where(t =>
+                t.UserId == userId &&
+                t.Date >= thisMonthStart)
             .GroupBy(t => t.AssetId)
             .Select(g => new
             {
@@ -204,13 +216,12 @@ public class DashboardSummaryQuery
             })
             .ToDictionaryAsync(x => x.AssetId, x => x.Dividends);
 
-        // -------------------------
         // Pagrindinė agregacija per asset
-        // -------------------------
         var perAsset = await (
             from t in tx
             join a in _db.Assets.AsNoTracking()
                 on t.AssetId equals a.Id
+            where a.UserId == userId
             group t by new { t.AssetId, a.Name } into g
             select new
             {
@@ -236,9 +247,6 @@ public class DashboardSummaryQuery
 
         var portfolioTotalInvested = perAsset.Sum(x => x.TotalInvested);
 
-        // -------------------------
-        // Formuojam eilutes
-        // -------------------------
         var rows = perAsset.Select(x =>
         {
             var gainLoss =
@@ -286,9 +294,6 @@ public class DashboardSummaryQuery
             };
         }).ToList();
 
-        // -------------------------
-        // TOTAL
-        // -------------------------
         var totalInvested = rows.Sum(x => x.TotalInvested);
         var totalGainLoss = rows.Sum(x => x.GainLoss);
         var totalGainLossLastMonth = rows.Sum(x => x.GainLossLastMonth);

@@ -5,7 +5,8 @@ namespace InvestmentTracker.API.Data;
 
 public class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options) { }
 
     public DbSet<Asset> Assets => Set<Asset>();
     public DbSet<AssetCategory> AssetCategories => Set<AssetCategory>();
@@ -16,23 +17,93 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // === ASSETS ===
+        // =========================
+        // USERS
+        // =========================
+        modelBuilder.Entity<User>(eb =>
+        {
+            eb.ToTable("Users");
+
+            eb.HasKey(u => u.Id);
+            eb.Property(u => u.Id)
+                .ValueGeneratedOnAdd();
+
+            eb.Property(u => u.Username)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            eb.HasIndex(u => u.Username)
+                .IsUnique();
+
+            eb.Property(u => u.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(255);
+        });
+
+        // =========================
+        // ASSET CATEGORIES
+        // =========================
+        modelBuilder.Entity<AssetCategory>(eb =>
+        {
+            eb.ToTable("AssetCategories");
+
+            eb.HasKey(c => c.Id);
+            eb.Property(c => c.Id)
+                .ValueGeneratedOnAdd();
+
+            eb.Property(c => c.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            eb.Property(c => c.IsActive)
+                .HasDefaultValue(true);
+
+            eb.Property(c => c.UserId)
+                .IsRequired();
+
+            eb.HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            eb.HasIndex(c => new { c.UserId, c.Name })
+                .IsUnique();
+        });
+
+        // =========================
+        // ASSETS
+        // =========================
         modelBuilder.Entity<Asset>(eb =>
         {
             eb.ToTable("Assets");
 
             eb.HasKey(a => a.Id);
-            eb.Property(a => a.Id).ValueGeneratedOnAdd(); // ✅ AUTO_INCREMENT
+            eb.Property(a => a.Id)
+                .ValueGeneratedOnAdd();
 
-            eb.Property(a => a.Name).IsRequired().HasMaxLength(200);
-                eb.Property(a => a.CategoryId)
+            eb.Property(a => a.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            eb.Property(a => a.UserId)
+                .IsRequired();
+
+            eb.HasOne(a => a.User)
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            eb.Property(a => a.CategoryId)
                 .IsRequired();
 
             eb.HasOne(a => a.Category)
                 .WithMany(c => c.Assets)
                 .HasForeignKey(a => a.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
-            eb.Property(a => a.Status).IsRequired().HasConversion<int>();
+
+            eb.Property(a => a.Status)
+                .IsRequired()
+                .HasConversion<int>();
 
             eb.Property(a => a.ValueChangeCurrency)
                 .IsRequired()
@@ -44,28 +115,42 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(3)
                 .HasDefaultValue("EUR");
 
-            // ✅ MySQL-friendly check constraints
+            eb.HasIndex(a => new { a.UserId, a.Name })
+                .IsUnique();
+
             eb.ToTable(tb =>
             {
                 tb.HasCheckConstraint(
                     "CK_Asset_ValueChangeCurrency",
                     "ValueChangeCurrency IN ('EUR','USD')");
+
                 tb.HasCheckConstraint(
                     "CK_Asset_DividendCurrency",
                     "DividendCurrency IN ('EUR','USD')");
             });
         });
 
-        // === TRANSACTIONS ===
+        // =========================
+        // TRANSACTIONS
+        // =========================
         modelBuilder.Entity<Transaction>(eb =>
         {
             eb.ToTable("Transactions");
 
             eb.HasKey(t => t.Id);
-            eb.Property(t => t.Id).ValueGeneratedOnAdd(); // ✅ AUTO_INCREMENT
+            eb.Property(t => t.Id)
+                .ValueGeneratedOnAdd();
+
+            eb.Property(t => t.UserId)
+                .IsRequired();
+
+            eb.HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             eb.Property(t => t.Date)
-                .HasColumnType("datetime") // ✅ FIX: no TEXT, indexable
+                .HasColumnType("datetime")
                 .IsRequired();
 
             eb.Property(t => t.ValueChange)
@@ -88,35 +173,19 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(t => t.AssetId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            eb.HasIndex(t => new { t.AssetId, t.Date })
-                .IsUnique(); // ✅ Works now since Date is datetime
+            eb.HasIndex(t => new { t.UserId, t.AssetId, t.Date })
+                .IsUnique();
 
             eb.ToTable(tb =>
             {
                 tb.HasCheckConstraint(
                     "CK_Transaction_CurrentValue_NonNegative",
                     "CurrentValue >= 0");
+
                 tb.HasCheckConstraint(
                     "CK_Transaction_Dividend_NonNegative",
                     "Dividend >= 0");
             });
-        });
-
-        // === USERS ===
-        modelBuilder.Entity<User>(eb =>
-        {
-            eb.ToTable("Users");
-
-            eb.HasKey(u => u.Id);
-            eb.Property(u => u.Id).ValueGeneratedOnAdd(); // ✅ AUTO_INCREMENT
-
-            eb.Property(u => u.Username)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            eb.Property(u => u.PasswordHash)
-                .IsRequired()
-                .HasMaxLength(255);
         });
     }
 }

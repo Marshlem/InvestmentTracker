@@ -7,38 +7,62 @@ namespace InvestmentTracker.API.Services;
 public class TransactionService : ITransactionService
 {
     private readonly ApplicationDbContext _db;
-    public TransactionService(ApplicationDbContext db) => _db = db;
 
-    public async Task BulkUpsertAsync(DateTime date, List<Transaction> txs)
+    public TransactionService(ApplicationDbContext db)
     {
-        var nextDay = date.Date.AddDays(1);
-        var assetIds = txs.Select(t => t.AssetId).Distinct().ToList();
+        _db = db;
+    }
 
-        var existingByAsset = await _db.Transactions
-            .Where(t => assetIds.Contains(t.AssetId)
-                        && t.Date >= date.Date
-                        && t.Date < nextDay)
+    public async Task BulkUpsertAsync(
+        int userId,
+        DateTime date,
+        List<Transaction> txs)
+    {
+        var dayStart = date.Date;
+        var dayEnd = dayStart.AddDays(1);
+
+        var assetIds = txs
+            .Select(t => t.AssetId)
+            .Distinct()
+            .ToList();
+
+        var allowedAssetIds = await _db.Assets
+            .AsNoTracking()
+            .Where(a => a.UserId == userId && assetIds.Contains(a.Id))
+            .Select(a => a.Id)
+            .ToListAsync();
+
+        var existing = await _db.Transactions
+            .Where(t =>
+                allowedAssetIds.Contains(t.AssetId) &&
+                t.UserId == userId &&
+                t.Date >= dayStart &&
+                t.Date < dayEnd)
             .ToListAsync();
 
         foreach (var tx in txs)
         {
-            var existing = existingByAsset.FirstOrDefault(t => t.AssetId == tx.AssetId);
+            if (!allowedAssetIds.Contains(tx.AssetId))
+                continue;
 
-            if (existing == null)
+            var current = existing.FirstOrDefault(t => t.AssetId == tx.AssetId);
+
+            if (current == null)
             {
-                tx.Date = date.Date;
+                tx.UserId = userId;
+                tx.Date = dayStart;
+
                 _db.Transactions.Add(tx);
             }
             else
             {
-                existing.ValueChange  = tx.ValueChange;
-                existing.CurrentValue = tx.CurrentValue;
-                existing.Dividend     = tx.Dividend;
-                existing.Notes        = tx.Notes;
+                current.ValueChange  = tx.ValueChange;
+                current.CurrentValue = tx.CurrentValue;
+                current.Dividend     = tx.Dividend;
+                current.Notes        = tx.Notes;
             }
         }
 
         await _db.SaveChangesAsync();
     }
-
 }

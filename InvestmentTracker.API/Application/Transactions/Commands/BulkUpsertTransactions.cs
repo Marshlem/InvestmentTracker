@@ -3,8 +3,23 @@ using InvestmentTracker.API.DTOs.Transactions;
 
 namespace InvestmentTracker.API.Application.Transactions.Commands;
 
-public record BulkUpsertTransactionsCommand(DateTime Date, List<BulkUpsertItem> Items)
-    : IRequest<BulkUpsertResult>;
+public sealed class BulkUpsertTransactionsCommand
+    : IRequest<BulkUpsertResult>
+{
+    public int UserId { get; }
+    public DateTime Date { get; }
+    public List<BulkUpsertItem> Items { get; }
+
+    public BulkUpsertTransactionsCommand(
+        int userId,
+        DateTime date,
+        List<BulkUpsertItem> items)
+    {
+        UserId = userId;
+        Date = date;
+        Items = items;
+    }
+}
 
 public sealed class BulkUpsertResult
 {

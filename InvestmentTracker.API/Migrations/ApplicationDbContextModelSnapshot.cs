@@ -48,6 +48,9 @@ namespace InvestmentTracker.API.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ValueChangeCurrency")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -58,6 +61,9 @@ namespace InvestmentTracker.API.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId", "Name")
+                        .IsUnique();
 
                     b.ToTable("Assets", null, t =>
                         {
@@ -76,15 +82,24 @@ namespace InvestmentTracker.API.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("AssetCategories");
+                    b.HasIndex("UserId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("AssetCategories", (string)null);
                 });
 
             modelBuilder.Entity("InvestmentTracker.API.Models.Transaction", b =>
@@ -115,6 +130,9 @@ namespace InvestmentTracker.API.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("ValueChange")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(18,2)")
@@ -122,7 +140,9 @@ namespace InvestmentTracker.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssetId", "Date")
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("UserId", "AssetId", "Date")
                         .IsUnique();
 
                     b.ToTable("Transactions", null, t =>
@@ -153,6 +173,9 @@ namespace InvestmentTracker.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Username")
+                        .IsUnique();
+
                     b.ToTable("Users", (string)null);
                 });
 
@@ -164,7 +187,26 @@ namespace InvestmentTracker.API.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("InvestmentTracker.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InvestmentTracker.API.Models.AssetCategory", b =>
+                {
+                    b.HasOne("InvestmentTracker.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InvestmentTracker.API.Models.Transaction", b =>
@@ -175,7 +217,15 @@ namespace InvestmentTracker.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("InvestmentTracker.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Asset");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InvestmentTracker.API.Models.Asset", b =>

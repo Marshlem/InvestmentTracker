@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InvestmentTracker.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251227101121_ConvertAssetStatusToEnum")]
-    partial class ConvertAssetStatusToEnum
+    [Migration("20260112165450_InitialSchema")]
+    partial class InitialSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,10 +33,8 @@ namespace InvestmentTracker.API.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("DividendCurrency")
                         .IsRequired()
@@ -53,6 +51,9 @@ namespace InvestmentTracker.API.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ValueChangeCurrency")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -62,12 +63,46 @@ namespace InvestmentTracker.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId", "Name")
+                        .IsUnique();
+
                     b.ToTable("Assets", null, t =>
                         {
                             t.HasCheckConstraint("CK_Asset_DividendCurrency", "DividendCurrency IN ('EUR','USD')");
 
                             t.HasCheckConstraint("CK_Asset_ValueChangeCurrency", "ValueChangeCurrency IN ('EUR','USD')");
                         });
+                });
+
+            modelBuilder.Entity("InvestmentTracker.API.Models.AssetCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("AssetCategories", (string)null);
                 });
 
             modelBuilder.Entity("InvestmentTracker.API.Models.Transaction", b =>
@@ -98,6 +133,9 @@ namespace InvestmentTracker.API.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("ValueChange")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(18,2)")
@@ -105,7 +143,9 @@ namespace InvestmentTracker.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssetId", "Date")
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("UserId", "AssetId", "Date")
                         .IsUnique();
 
                     b.ToTable("Transactions", null, t =>
@@ -136,7 +176,40 @@ namespace InvestmentTracker.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Username")
+                        .IsUnique();
+
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("InvestmentTracker.API.Models.Asset", b =>
+                {
+                    b.HasOne("InvestmentTracker.API.Models.AssetCategory", "Category")
+                        .WithMany("Assets")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("InvestmentTracker.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InvestmentTracker.API.Models.AssetCategory", b =>
+                {
+                    b.HasOne("InvestmentTracker.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InvestmentTracker.API.Models.Transaction", b =>
@@ -147,12 +220,25 @@ namespace InvestmentTracker.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("InvestmentTracker.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Asset");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InvestmentTracker.API.Models.Asset", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("InvestmentTracker.API.Models.AssetCategory", b =>
+                {
+                    b.Navigation("Assets");
                 });
 #pragma warning restore 612, 618
         }

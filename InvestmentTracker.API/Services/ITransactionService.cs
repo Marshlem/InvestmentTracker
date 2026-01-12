@@ -4,5 +4,5 @@ namespace InvestmentTracker.API.Services;
 
 public interface ITransactionService
 {
-    Task BulkUpsertAsync(DateTime date, List<Transaction> txs);
+    Task BulkUpsertAsync(int userId, DateTime date, List<Transaction> txs);
 }

@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "e3hVuM1Wy0I=",
+  "dgSpecHash": "vPte1wv/Prk=",
   "success": true,
   "projectFilePath": "C:\\Users\\sigit\\Desktop\\cProjects\\InvestmentApp\\InvestmentTracker.API\\InvestmentTracker.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\sigit\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\sigit\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
+    "C:\\Users\\sigit\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\sigit\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512",
     "C:\\Users\\sigit\\.nuget\\packages\\fluentvalidation.aspnetcore\\11.3.1\\fluentvalidation.aspnetcore.11.3.1.nupkg.sha512",
     "C:\\Users\\sigit\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.11.0\\fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",

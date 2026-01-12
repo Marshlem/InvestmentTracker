@@ -2,17 +2,28 @@ using InvestmentTracker.API.Data;
 using InvestmentTracker.API.DTOs;
 using Microsoft.EntityFrameworkCore;
 
-
 public class TransactionsHistoryQuery
 {
     private readonly ApplicationDbContext _db;
-    public TransactionsHistoryQuery(ApplicationDbContext db) => _db = db;
 
-    public async Task<PagedResult<TransactionHistoryResponse>> ExecuteAsync(TransactionHistoryRequest req)
+    public TransactionsHistoryQuery(ApplicationDbContext db)
+    {
+        _db = db;
+    }
+
+    // =========================
+    // HISTORY (paged)
+    // =========================
+    public async Task<PagedResult<TransactionHistoryResponse>> ExecuteAsync(
+        int userId,
+        TransactionHistoryRequest req)
     {
         var q = _db.Transactions
             .AsNoTracking()
-            .Where(t => t.Date >= req.DateFrom && t.Date <= req.DateTo);
+            .Where(t =>
+                t.UserId == userId &&
+                t.Date >= req.DateFrom &&
+                t.Date <= req.DateTo);
 
         if (req.AssetId.HasValue)
             q = q.Where(t => t.AssetId == req.AssetId.Value);
@@ -44,10 +55,14 @@ public class TransactionsHistoryQuery
         };
     }
 
-        public async Task<List<TransactionsDropList>> ExecuteAsync()
+    // =========================
+    // LOOKUP (dropdown)
+    // =========================
+    public async Task<List<TransactionsDropList>> GetLookupAsync(int userId)
     {
         return await _db.Assets
             .AsNoTracking()
+            .Where(a => a.UserId == userId)
             .OrderBy(a => a.Name)
             .Select(a => new TransactionsDropList
             {

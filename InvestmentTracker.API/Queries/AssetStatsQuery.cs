@@ -11,9 +11,11 @@ public class AssetStatsQuery
         _db = db;
     }
 
-    public async Task<List<AssetWithStatsDto>> ExecuteAsync()
+    public async Task<List<AssetWithStatsDto>> ExecuteAsync(int userId)
     {
         return await _db.Assets
+            .AsNoTracking()
+            .Where(a => a.UserId == userId)
             .Select(a => new AssetWithStatsDto
             {
                 Id = a.Id,
@@ -24,15 +26,15 @@ public class AssetStatsQuery
                 DividendCurrency = a.DividendCurrency,
 
                 TotalInvested = _db.Transactions
-                    .Where(t => t.AssetId == a.Id)
+                    .Where(t => t.UserId == userId && t.AssetId == a.Id)
                     .Sum(t => (decimal?)t.ValueChange) ?? 0m,
 
                 TotalDividends = _db.Transactions
-                    .Where(t => t.AssetId == a.Id)
+                    .Where(t => t.UserId == userId && t.AssetId == a.Id)
                     .Sum(t => (decimal?)t.Dividend) ?? 0m,
 
                 CurrentValue = _db.Transactions
-                    .Where(t => t.AssetId == a.Id)
+                    .Where(t => t.UserId == userId && t.AssetId == a.Id)
                     .OrderByDescending(t => t.Date)
                     .Select(t => t.CurrentValue)
                     .FirstOrDefault()

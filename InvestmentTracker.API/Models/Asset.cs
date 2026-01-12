@@ -14,4 +14,6 @@ public class Asset
     public string DividendCurrency { get; set; } = "EUR";
 
     public List<Transaction> Transactions { get; set; } = new();
+    public int UserId { get; set; }
+    public User User { get; set; } = default!;
 }
