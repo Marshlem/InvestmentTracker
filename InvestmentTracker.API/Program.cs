@@ -12,11 +12,9 @@ using System.Diagnostics;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
-builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-    opt.UseMySql(
-        builder.Configuration.GetConnectionString("Default"),
-        new MySqlServerVersion(new Version(8, 0, 36))
-    ));
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 
 builder.Services.AddControllers()

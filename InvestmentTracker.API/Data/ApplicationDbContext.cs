@@ -122,11 +122,11 @@ public class ApplicationDbContext : DbContext
             {
                 tb.HasCheckConstraint(
                     "CK_Asset_ValueChangeCurrency",
-                    "ValueChangeCurrency IN ('EUR','USD')");
+                    "\"ValueChangeCurrency\" IN ('EUR','USD')");
 
                 tb.HasCheckConstraint(
                     "CK_Asset_DividendCurrency",
-                    "DividendCurrency IN ('EUR','USD')");
+                    "\"DividendCurrency\" IN ('EUR','USD')");
             });
         });
 
@@ -150,19 +150,19 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             eb.Property(t => t.Date)
-                .HasColumnType("datetime")
+                .HasColumnType("timestamp")
                 .IsRequired();
 
             eb.Property(t => t.ValueChange)
-                .HasColumnType("decimal(18,2)")
+                .HasColumnType("numeric(18,2)")
                 .HasDefaultValue(0m);
 
             eb.Property(t => t.CurrentValue)
-                .HasColumnType("decimal(18,2)")
+                .HasColumnType("numeric(18,2)")
                 .HasDefaultValue(0m);
 
             eb.Property(t => t.Dividend)
-                .HasColumnType("decimal(18,2)")
+                .HasColumnType("numeric(18,2)")
                 .HasDefaultValue(0m);
 
             eb.Property(t => t.Notes)
@@ -180,11 +180,11 @@ public class ApplicationDbContext : DbContext
             {
                 tb.HasCheckConstraint(
                     "CK_Transaction_CurrentValue_NonNegative",
-                    "CurrentValue >= 0");
+                    "\"CurrentValue\" >= 0");
 
                 tb.HasCheckConstraint(
                     "CK_Transaction_Dividend_NonNegative",
-                    "Dividend >= 0");
+                    "\"Dividend\" >= 0");
             });
         });
     }
