@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { isAuthenticated, logout } from '@/services/authService'
+import { isAuthenticated, logoutAndRedirect } from '@/services/authService'
 import AppFooter from '@/layouts/AppFooter.vue'
 </script>
 
@@ -42,11 +42,7 @@ import AppFooter from '@/layouts/AppFooter.vue'
 
       <!-- LOGOUT -->
       <div class="ml-auto">
-        <button
-          v-if="isAuthenticated()"
-          @click="logout"
-          class="px-3 py-2 text-sm rounded-md hover:bg-black/5"
-        >
+        <button @click="logoutAndRedirect" class="px-3 py-2 text-sm rounded-md hover:bg-black/5">
           Logout
         </button>
       </div>
