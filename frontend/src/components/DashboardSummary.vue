@@ -1,29 +1,29 @@
 <template>
   <div class="grid gap-4 md:grid-cols-4">
-    <div class="rounded-xl border p-4">
-      <div class="text-sm opacity-70">Total Invested</div>
-      <div class="text-2xl font-semibold">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-sm text-gray-500">Total Invested</div>
+      <div class="text-2xl font-semibold text-gray-900">
         {{ currency(summary.totalInvested) }}
       </div>
     </div>
 
-    <div class="rounded-xl border p-4">
-      <div class="text-sm opacity-70">Current Value</div>
-      <div class="text-2xl font-semibold">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-sm text-gray-500">Current Value</div>
+      <div class="text-2xl font-semibold text-gray-900">
         {{ currency(summary.currentValue) }}
       </div>
     </div>
 
-        <div class="rounded-xl border p-4">
-      <div class="text-sm opacity-70">Total Dividends</div>
-      <div class="text-2xl font-semibold">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-sm text-gray-500">Total Dividends</div>
+      <div class="text-2xl font-semibold text-gray-900">
         {{ currency(summary.totalDividends) }}
       </div>
     </div>
 
-    <div class="rounded-xl border p-4">
-      <div class="text-sm opacity-70">P/L</div>
-      <div :class="plClass">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="text-sm text-gray-500">P/L</div>
+      <div class="text-2xl font-semibold" :class="plClass">
         {{ currency(summary.profitLoss) }}
       </div>
     </div>

@@ -1,32 +1,34 @@
 <template>
-  <div class="flex items-end gap-4 flex-wrap">
-
+  <div class="flex flex-wrap items-end gap-4">
     <!-- From -->
     <div class="flex flex-col">
-      <label class="text-sm">From</label>
+      <label class="text-sm font-medium text-gray-700">From</label>
       <input
         type="date"
         v-model="local.dateFrom"
-        class="border rounded px-2 py-1"
+        class="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900
+               focus:outline-none focus:ring-2 focus:ring-blue-600/40"
       />
     </div>
 
     <!-- To -->
     <div class="flex flex-col">
-      <label class="text-sm">To</label>
+      <label class="text-sm font-medium text-gray-700">To</label>
       <input
         type="date"
         v-model="local.dateTo"
-        class="border rounded px-2 py-1"
+        class="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900
+               focus:outline-none focus:ring-2 focus:ring-blue-600/40"
       />
     </div>
 
     <!-- Group by -->
     <div class="flex flex-col">
-      <label class="text-sm">Group by</label>
+      <label class="text-sm font-medium text-gray-700">Group by</label>
       <select
         v-model="local.groupBy"
-        class="border rounded px-2 py-1"
+        class="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900
+               focus:outline-none focus:ring-2 focus:ring-blue-600/40"
       >
         <option value="month">Month</option>
         <option value="quarter">Quarter</option>
@@ -36,10 +38,11 @@
 
     <!-- Asset -->
     <div class="flex flex-col min-w-[220px]">
-      <label class="text-sm">Asset</label>
+      <label class="text-sm font-medium text-gray-700">Asset</label>
       <select
         v-model="local.assetId"
-        class="border rounded px-2 py-1"
+        class="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900
+               focus:outline-none focus:ring-2 focus:ring-blue-600/40"
       >
         <option :value="null">All assets</option>
         <option
@@ -54,15 +57,15 @@
 
     <!-- Apply -->
     <button
-      class="border px-4 py-2 rounded h-[38px]"
+      class="h-[38px] rounded-md border border-blue-600 bg-blue-600 px-4 py-2
+             text-sm font-medium text-white hover:bg-blue-700"
+      type="button"
       @click="apply"
     >
       Apply
     </button>
-
   </div>
 </template>
-
 
 <script setup>
 import { reactive } from 'vue'

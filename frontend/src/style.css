@@ -7,9 +7,9 @@
     line-height: 1.5;
     font-weight: 400;
 
-    color-scheme: dark;
-    color: #e0e0e0;
-    background-color: #1e1e1e;
+    color-scheme: light;
+    color: #111827;            /* gray-900 */
+    background-color: #f9fafb; /* gray-50 */
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -24,8 +24,8 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    background-color: #1e1e1e;
-    color: #e0e0e0;
+    background-color: #f9fafb;
+    color: #111827;
   }
 
   #app {
@@ -35,123 +35,57 @@
   }
 
   h1, h2, h3, h4, h5 {
-    color: #f0f0f0;
+    color: #111827;
     font-weight: 600;
   }
 
+  p {
+    color: #374151; /* gray-700 */
+  }
+
   a {
-    color: #8ab4f8;
+    color: #2563eb; /* blue-600 */
     font-weight: 500;
     text-decoration: none;
   }
 
   a:hover {
-    color: #aecbfa;
+    color: #1d4ed8; /* blue-700 */
+    text-decoration: underline;
   }
 
-  /* --- BUTTONS --- */
+  /* --- BUTTON RESET (VISUAL STYLE – TAILWIND VALDO) --- */
   button {
-    border-radius: 8px;
-    border: 1px solid #555;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    background-color: #2a2a2a;
-    color: #e0e0e0;
+    font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
   }
 
-  button:hover {
-    background-color: #3a3a3a;
-    border-color: #777;
-  }
-
-  button:focus {
-    outline: 2px solid #646cff;
-    outline-offset: 2px;
-  }
-
-  /* --- FORM ELEMENTS --- */
+  /* --- FORM RESET (STILIUS PER TAILWIND) --- */
   input,
   select,
   textarea {
-    background-color: #2b2b2b;
-    color: #e0e0e0;
-    border: 1px solid #555;
-    border-radius: 6px;
-    padding: 0.5em 0.75em;
-    width: 100%;
+    font-family: inherit;
   }
 
-  input:focus,
-  select:focus,
-  textarea:focus {
-    outline: none;
-    border-color: #646cff;
-    background-color: #333;
-  }
-
-  option {
-    background-color: #2b2b2b;
-    color: #e0e0e0;
-  }
-
-  textarea {
-    resize: vertical;
-  }
-
-  label {
-    color: #b0b0b0;
-  }
-
-  /* --- TABLES --- */
+  /* --- TABLE RESET --- */
   table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #1e1e1e;
-    color: #e0e0e0;
   }
 
-  th,
-  td {
-    padding: 0.75em 1em;
-    border-bottom: 1px solid #333;
-  }
-
-  th {
-    background-color: #2a2a2a;
-    color: #ccc;
-    font-weight: 600;
-    text-align: left;
-  }
-
-  tr:hover {
-    background-color: #2f2f2f;
-  }
-
-  /* --- CARD / PANEL STYLES --- */
-  .card {
-    background-color: #242424;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 1.5rem;
-    color: #e0e0e0;
-  }
-
-  /* --- SCROLLBAR DARK MODE --- */
+  /* --- SCROLLBAR (LIGHT) --- */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: #444;
+    background-color: #d1d5db; /* gray-300 */
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #666;
+    background-color: #9ca3af; /* gray-400 */
   }
 
   /* --- MEDIA --- */

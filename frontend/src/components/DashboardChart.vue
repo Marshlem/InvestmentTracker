@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6">
     <!-- Portfolio Value -->
-    <div class="border rounded-xl p-4 bg-gray-900">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
       <VChart
         v-if="portfolioOption"
         :option="portfolioOption"
@@ -11,7 +11,7 @@
     </div>
 
     <!-- Profit / Loss -->
-    <div class="border rounded-xl p-4 bg-gray-900">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
       <VChart
         v-if="profitLossOption"
         :option="profitLossOption"
@@ -66,18 +66,18 @@ function buildPortfolioChart(rows) {
   portfolioOption.value = {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', valueFormatter: eur },
-    legend: { top: 0, textStyle: { color: '#e5e7eb' } },
+    legend: { top: 0, textStyle: { color: '#374151' } },
     grid: { top: 40, left: 60, right: 30, bottom: 40 },
 
     xAxis: {
       type: 'category',
       data: rows.map(r => r.period),
-      axisLabel: { color: '#9ca3af' }
+      axisLabel: { color: '#4b5563' }
     },
 
     yAxis: {
       type: 'value',
-      axisLabel: { color: '#9ca3af', formatter: eur }
+      axisLabel: { color: '#4b5563', formatter: eur }
     },
 
     series: [
@@ -106,18 +106,18 @@ function buildProfitLossChart(rows) {
   profitLossOption.value = {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', valueFormatter: eur },
-    legend: { top: 0, textStyle: { color: '#e5e7eb' } },
+    legend: { top: 0, textStyle: { color: '#374151' } },
     grid: { top: 40, left: 60, right: 30, bottom: 40 },
 
     xAxis: {
       type: 'category',
       data: rows.map(r => r.period),
-      axisLabel: { color: '#9ca3af' }
+      axisLabel: { color: '#4b5563' }
     },
 
     yAxis: {
       type: 'value',
-      axisLabel: { color: '#9ca3af', formatter: eur }
+      axisLabel: { color: '#4b5563', formatter: eur }
     },
 
     series: [

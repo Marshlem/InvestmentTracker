@@ -1,27 +1,28 @@
 <template>
   <section class="p-4 space-y-4">
-    <h2 class="text-xl font-semibold">Update Transactions</h2>
+    <h2 class="text-xl font-semibold text-gray-900">Update Transactions</h2>
 
     <!-- Date -->
     <div class="grid gap-1 max-w-xs">
-      <label class="text-sm">Date</label>
+      <label class="text-sm font-medium text-gray-700">Date</label>
       <input
         type="date"
         v-model="date"
-        class="border rounded px-3 py-2"
+        class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900
+               focus:outline-none focus:ring-2 focus:ring-blue-600/40"
       />
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
       <table class="w-full text-sm border-collapse">
         <thead>
-          <tr class="border-b bg-gray-800 text-left">
-            <th class="py-2 px-2">Asset</th>
-            <th class="py-2 px-2 text-right">Change</th>
-            <th class="py-2 px-2 text-right">Current Value</th>
-            <th class="py-2 px-2 text-right">Dividend</th>
-            <th class="py-2 px-2">Notes</th>
+          <tr class="border-b border-gray-200 bg-gray-100 text-left">
+            <th class="py-2 px-2 font-semibold text-gray-700">Asset</th>
+            <th class="py-2 px-2 text-right font-semibold text-gray-700">Change</th>
+            <th class="py-2 px-2 text-right font-semibold text-gray-700">Current Value</th>
+            <th class="py-2 px-2 text-right font-semibold text-gray-700">Dividend</th>
+            <th class="py-2 px-2 font-semibold text-gray-700">Notes</th>
           </tr>
         </thead>
 
@@ -29,9 +30,9 @@
           <tr
             v-for="row in rows"
             :key="row.assetId"
-            class="border-b hover:bg-gray-800/50"
+            class="border-b border-gray-200 hover:bg-gray-50"
           >
-            <td class="px-2 py-2 font-medium">
+            <td class="px-2 py-2 font-medium text-gray-900">
               {{ row.assetName }}
             </td>
 
@@ -40,7 +41,8 @@
                 v-model.number="row.transaction.valueChange"
                 type="number"
                 step="0.01"
-                class="border rounded px-2 py-1 w-full text-right"
+                class="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-right text-gray-900
+                       focus:outline-none focus:ring-2 focus:ring-blue-600/40"
               />
             </td>
 
@@ -49,7 +51,8 @@
                 v-model.number="row.transaction.currentValue"
                 type="number"
                 step="0.01"
-                class="border rounded px-2 py-1 w-full text-right"
+                class="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-right text-gray-900
+                       focus:outline-none focus:ring-2 focus:ring-blue-600/40"
               />
             </td>
 
@@ -58,7 +61,8 @@
                 v-model.number="row.transaction.dividend"
                 type="number"
                 step="0.01"
-                class="border rounded px-2 py-1 w-full text-right"
+                class="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-right text-gray-900
+                       focus:outline-none focus:ring-2 focus:ring-blue-600/40"
               />
             </td>
 
@@ -66,13 +70,14 @@
               <input
                 v-model="row.transaction.notes"
                 placeholder="Notes..."
-                class="border rounded px-2 py-1 w-full"
+                class="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900
+                       focus:outline-none focus:ring-2 focus:ring-blue-600/40"
               />
             </td>
           </tr>
 
           <tr v-if="!rows.length">
-            <td colspan="5" class="text-center text-gray-500 py-4">
+            <td colspan="5" class="py-4 text-center text-gray-500">
               No active assets
             </td>
           </tr>
@@ -83,16 +88,20 @@
     <!-- Actions -->
     <div class="flex justify-end gap-3 pt-3">
       <button
-        class="border rounded px-3 py-2"
+        class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm
+               hover:bg-gray-50"
         @click="$emit('cancel')"
+        type="button"
       >
         Cancel
       </button>
 
       <button
-        class="border rounded px-3 py-2"
+        class="rounded-md border border-blue-600 bg-blue-600 px-3 py-2 text-sm font-medium text-white
+               hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
         @click="save"
         :disabled="saving"
+        type="button"
       >
         Save
       </button>

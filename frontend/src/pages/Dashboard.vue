@@ -1,20 +1,26 @@
 <template>
   <section class="p-6 space-y-6">
-    <h1 class="text-2xl font-semibold">Reports</h1>
+    <h1 class="text-2xl font-semibold text-gray-900">Reports</h1>
 
     <!-- TABS -->
-    <div class="flex gap-2 border-b pb-2">
+    <div class="flex gap-2 border-b border-gray-200 pb-2">
       <button
-        class="px-3 py-1 rounded"
-        :class="tab === 'graphs' ? 'bg-gray-700' : 'bg-gray-800'"
+        class="rounded-md border px-3 py-1.5 text-sm font-medium transition
+               hover:bg-gray-50"
+        :class="tab === 'graphs'
+          ? 'border-blue-600 bg-blue-50 text-gray-900'
+          : 'border-gray-300 bg-white text-gray-600'"
         @click="tab = 'graphs'"
       >
         Graphs
       </button>
 
       <button
-        class="px-3 py-1 rounded"
-        :class="tab === 'tables' ? 'bg-gray-700' : 'bg-gray-800'"
+        class="rounded-md border px-3 py-1.5 text-sm font-medium transition
+               hover:bg-gray-50"
+        :class="tab === 'tables'
+          ? 'border-blue-600 bg-blue-50 text-gray-900'
+          : 'border-gray-300 bg-white text-gray-600'"
         @click="tab = 'tables'"
       >
         Tables
@@ -23,7 +29,6 @@
 
     <!-- GRAPHS TAB -->
     <div v-if="tab === 'graphs'" class="space-y-6">
-
       <!-- SUMMARY -->
       <DashboardSummary
         v-if="summary"
@@ -38,17 +43,15 @@
 
       <!-- CHART -->
       <DashboardChart :filters="filters" />
-
     </div>
 
     <!-- TABLES TAB -->
     <div v-else>
       <DashboardInvestmentTable
-      :rows="investmentTable"
-      :total="investmentTotal"
-/>
+        :rows="investmentTable"
+        :total="investmentTotal"
+      />
     </div>
-
   </section>
 </template>
 

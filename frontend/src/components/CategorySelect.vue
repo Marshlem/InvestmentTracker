@@ -1,9 +1,9 @@
 <template>
   <div class="space-y-2">
-
     <select
       v-model="internalValue"
-      class="border rounded px-3 py-2 bg-gray-700 w-full"
+      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900
+             focus:outline-none focus:ring-2 focus:ring-blue-600/40"
     >
       <option disabled value="">Select category</option>
 
@@ -20,46 +20,80 @@
     </select>
 
     <!-- Manage section -->
-    <div v-if="managing" class="border rounded p-3 space-y-2 bg-gray-800">
+    <div v-if="managing" class="rounded-xl border border-gray-200 bg-white p-3 space-y-2 shadow-sm">
       <div
         v-for="c in categories"
         :key="c.id"
         class="flex items-center gap-2"
       >
         <template v-if="editingId !== c.id">
-          <span
-            :class="c.isActive ? '' : 'line-through opacity-50'"
-          >
+          <span :class="c.isActive ? 'text-gray-900' : 'text-gray-500 line-through'">
             {{ c.name }}
           </span>
 
-        ➜
-            <button type="button" @click="startEdit(c)">✏️</button>
-            <button type="button" @click="toggleActive(c)">
+          <span class="text-gray-300">➜</span>
+
+          <button
+            type="button"
+            class="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
+            @click="startEdit(c)"
+          >
+            ✏️
+          </button>
+
+          <button
+            type="button"
+            class="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
+            @click="toggleActive(c)"
+          >
             {{ c.isActive ? '❌' : '✔️' }}
-            </button>
+          </button>
         </template>
 
         <template v-else>
-            <input
+          <input
             v-model="tempName"
-            class="bg-gray-700 rounded px-2 py-1"
+            class="w-full max-w-[260px] rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900
+                   focus:outline-none focus:ring-2 focus:ring-blue-600/40"
             @keydown.enter.stop.prevent
-            />
-            <button type="button" @click="saveEdit(c)">💾</button>
-            <button type="button" @click="cancelEdit">✖️</button>
+          />
+
+          <button
+            type="button"
+            class="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
+            @click="saveEdit(c)"
+          >
+            💾
+          </button>
+
+          <button
+            type="button"
+            class="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
+            @click="cancelEdit"
+          >
+            ✖️
+          </button>
         </template>
       </div>
 
       <!-- New category -->
       <div class="flex gap-2 pt-2">
-            <input
-            v-model="newCategory"
-            placeholder="New category name"
-            class="bg-gray-700 rounded px-2 py-1 flex-1"
-            @keydown.enter.stop.prevent
-            />
-        <button type="button" @click="addCategory">➕ Add</button>
+        <input
+          v-model="newCategory"
+          placeholder="New category name"
+          class="flex-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-900
+                 focus:outline-none focus:ring-2 focus:ring-blue-600/40"
+          @keydown.enter.stop.prevent
+        />
+
+        <button
+          type="button"
+          class="rounded-md border border-blue-600 bg-blue-600 px-3 py-1 text-sm font-medium text-white
+                 hover:bg-blue-700"
+          @click="addCategory"
+        >
+          Add
+        </button>
       </div>
     </div>
   </div>
