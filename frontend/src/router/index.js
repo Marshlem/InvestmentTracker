@@ -2,11 +2,36 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { isAuthenticated } from '@/services/authService'
 
 const routes = [
-  { path: '/login', name: 'login', component: () => import('../pages/Login.vue') },
+  // LOGIN (be layout)
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../pages/Login.vue')
+  },
 
-  { path: '/', name: 'dashboard', component: () => import('../pages/Dashboard.vue'), meta: { requiresAuth: true } },
-  { path: '/assets', name: 'assets', component: () => import('../pages/Assets.vue'), meta: { requiresAuth: true } },
-  { path: '/transactions', name: 'transactions', component: () => import('../pages/Transactions.vue'), meta: { requiresAuth: true } },
+  // APP su layout
+  {
+    path: '/',
+    component: () => import('../layouts/DefaultLayout.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'dashboard',
+        component: () => import('../pages/Dashboard.vue')
+      },
+      {
+        path: 'assets',
+        name: 'assets',
+        component: () => import('../pages/Assets.vue')
+      },
+      {
+        path: 'transactions',
+        name: 'transactions',
+        component: () => import('../pages/Transactions.vue')
+      }
+    ]
+  }
 ]
 
 const router = createRouter({
@@ -17,6 +42,10 @@ const router = createRouter({
 router.beforeEach((to) => {
   if (to.meta.requiresAuth && !isAuthenticated()) {
     return { name: 'login' }
+  }
+
+  if (to.name === 'login' && isAuthenticated()) {
+    return { name: 'dashboard' }
   }
 })
 

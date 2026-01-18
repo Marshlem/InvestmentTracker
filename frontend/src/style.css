@@ -30,8 +30,6 @@
 
   #app {
     width: 100%;
-    max-width: 1280px;
-    padding: 2rem;
   }
 
   h1, h2, h3, h4, h5 {

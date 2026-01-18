@@ -1,4 +1,5 @@
 import api from './api'
+import router from '@/router'
 
 export function register(username, password) {
   return api.post('/auth/register', { username, password })
@@ -13,6 +14,7 @@ export async function login(username, password) {
 
 export function logout() {
   localStorage.removeItem('token')
+  router.push({ name: 'login' })
 }
 
 export function isAuthenticated() {
