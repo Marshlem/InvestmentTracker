@@ -1,8 +1,9 @@
 <template>
   <section class="p-6 space-y-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Assets</h1>
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-semibold text-gray-900">Assets</h1>
+    
       <button
         class="rounded-md border border-gray-300 bg-white px-3 py-2
                text-sm font-medium text-gray-900 hover:bg-gray-50"
