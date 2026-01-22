@@ -1,9 +1,10 @@
 <template>
   <form class="grid gap-3" @submit.prevent="onLogin">
     <input
-      v-model="username"
-      placeholder="Username"
-      autocomplete="username"
+      v-model="email"
+      type="email"
+      placeholder="Email"
+      autocomplete="email"
       class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900
              placeholder:text-gray-400
              focus:outline-none focus:ring-2 focus:ring-blue-600/40"
@@ -40,7 +41,8 @@ import { login } from '@/services/authService'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const username = ref('')
+
+const email = ref('')
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
@@ -50,10 +52,10 @@ const onLogin = async () => {
   loading.value = true
 
   try {
-    await login(username.value, password.value)
+    await login(email.value, password.value)
     router.push({ name: 'dashboard' })
   } catch {
-    error.value = 'Invalid username or password'
+    error.value = 'Invalid email or password'
   } finally {
     loading.value = false
   }

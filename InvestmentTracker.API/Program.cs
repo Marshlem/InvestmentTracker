@@ -1,13 +1,12 @@
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using InvestmentTracker.API.Data;
 using InvestmentTracker.API.Services;
-using MediatR;
 using System.Reflection;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using System.Diagnostics;
+using InvestmentTracker.API.Infrastructure.Security;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -33,6 +32,8 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<TransactionsQuery>();
 builder.Services.AddScoped<DashboardSummaryQuery>();
 builder.Services.AddScoped<TransactionsHistoryQuery>();
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
+builder.Services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
 
 builder.Services.AddMediatR(cfg =>
 {
@@ -65,6 +66,15 @@ builder.Services.AddCors(opt =>
          .AllowCredentials()); // optional
 });
 
+builder.Services.AddRateLimiter(opt =>
+{
+    opt.AddFixedWindowLimiter("auth", options =>
+    {
+        options.Window = TimeSpan.FromMinutes(1);
+        options.PermitLimit = 5;
+    });
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -80,6 +90,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(CorsPolicy);
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

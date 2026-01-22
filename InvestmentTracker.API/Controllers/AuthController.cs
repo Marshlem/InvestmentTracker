@@ -1,13 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using BCrypt.Net;
 using InvestmentTracker.API.Data;
 using InvestmentTracker.API.Models;
 using InvestmentTracker.API.DTOs.Authentification;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using InvestmentTracker.API.Infrastructure.Security;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace InvestmentTracker.API.Controllers;
 
@@ -16,68 +13,73 @@ namespace InvestmentTracker.API.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
-    private readonly IConfiguration _config;
+    private readonly ITokenService _tokenService;
+    private readonly IRefreshTokenService _refreshTokenService;
 
-    public AuthController(ApplicationDbContext db, IConfiguration config)
+    public AuthController(
+        ApplicationDbContext db,
+        ITokenService tokenService,
+        IRefreshTokenService refreshTokenService)
     {
         _db = db;
-        _config = config;
+        _tokenService = tokenService;
+        _refreshTokenService = refreshTokenService;
     }
 
+    [EnableRateLimiting("auth")]
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
     {
+        var email = request.Email.Trim().ToLowerInvariant();
+
         var user = await _db.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Username == request.Username);
+            .FirstOrDefaultAsync(x => x.Email == email);
 
         if (user == null)
             return Unauthorized("Invalid credentials");
 
-        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        if (user.LockoutUntilUtc > DateTime.UtcNow)
             return Unauthorized("Invalid credentials");
 
-        var token = GenerateToken(user);
+        if (user.Provider != AuthProvider.Local || user.PasswordHash == null)
+            return Unauthorized("Invalid credentials");
 
-        return Ok(new LoginResponse { Token = token });
-    }
-
-    private string GenerateToken(User user)
-    {
-        var claims = new List<Claim>
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
-            new Claim(ClaimTypes.Name, user.Username)
-        };
+            user.FailedLoginCount++;
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            if (user.FailedLoginCount >= 5)
+            {
+                user.LockoutUntilUtc = DateTime.UtcNow.AddMinutes(10);
+                user.FailedLoginCount = 0;
+            }
 
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            await _db.SaveChangesAsync();
+            return Unauthorized("Invalid credentials");
+        }
 
-        var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(8),
-            signingCredentials: creds
-        );
+        user.FailedLoginCount = 0;
+        user.LockoutUntilUtc = null;
+        await _db.SaveChangesAsync();
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var token = _tokenService.GenerateAccessToken(user);
+        return Ok(new LoginResponse { Token = token });
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
-        if (await _db.Users.AnyAsync(u => u.Username == request.Username))
-            return BadRequest("Username already exists");
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        if (await _db.Users.AnyAsync(u => u.Email == request.Email))
+            return BadRequest("Email already exists");
 
         var user = new User
         {
-            Username = request.Username,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
+            Email = email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Provider = AuthProvider.Local,
+            EmailVerified = false
         };
 
         _db.Users.Add(user);
@@ -105,5 +107,43 @@ public sealed class AuthController : ControllerBase
         await _db.SaveChangesAsync();
 
         return Ok();
+    }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshTokenRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            return Unauthorized();
+
+        var tokenHash = _refreshTokenService.Hash(request.RefreshToken);
+
+        var storedToken = await _db.RefreshTokens
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x =>
+                x.TokenHash == tokenHash &&
+                !x.Revoked &&
+                x.ExpiresAtUtc > DateTime.UtcNow);
+
+        if (storedToken == null)
+            return Unauthorized();
+
+        storedToken.Revoked = true;
+
+        var newRefreshToken = _refreshTokenService.Generate();
+
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            UserId = storedToken.UserId,
+            TokenHash = _refreshTokenService.Hash(newRefreshToken),
+            ExpiresAtUtc = DateTime.UtcNow.AddDays(14)
+        });
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new LoginResponse
+        {
+            Token = _tokenService.GenerateAccessToken(storedToken.User),
+            RefreshToken = newRefreshToken
+        });
     }
 }

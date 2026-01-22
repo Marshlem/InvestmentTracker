@@ -1,9 +1,10 @@
 <template>
   <form class="grid gap-3" @submit.prevent="onRegister">
     <input
-      v-model="username"
-      placeholder="Username"
-      autocomplete="username"
+      v-model="email"
+      type="email"
+      placeholder="Email"
+      autocomplete="email"
       class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900
              placeholder:text-gray-400
              focus:outline-none focus:ring-2 focus:ring-blue-600/40"
@@ -51,7 +52,7 @@
 import { ref } from 'vue'
 import { register } from '@/services/authService'
 
-const username = ref('')
+const email = ref('')
 const password = ref('')
 const confirm = ref('')
 const error = ref('')
@@ -61,8 +62,8 @@ const onRegister = async () => {
   error.value = ''
   success.value = false
 
-  if (!username.value || !password.value) {
-    error.value = 'Username and password are required'
+  if (!email.value || !password.value) {
+    error.value = 'Email and password are required'
     return
   }
 
@@ -72,17 +73,14 @@ const onRegister = async () => {
   }
 
   try {
-    await register(username.value, password.value)
+    await register(email.value, password.value)
     success.value = true
 
-    username.value = ''
+    email.value = ''
     password.value = ''
     confirm.value = ''
-  } catch (e) {
-    error.value =
-      e?.response?.data ??
-      e.message ??
-      'Registration failed'
+  } catch {
+    error.value = 'Registration failed'
   }
 }
 </script>
