@@ -29,8 +29,7 @@ public class AssetSummaryQuery
                     .Where(t =>
                         t.UserId == userId &&
                         t.AssetId == a.Id &&
-                        t.Date <= date &&
-                        t.ValueChange > 0)
+                        t.Date <= date)
                     .Sum(t => (decimal?)t.ValueChange) ?? 0m,
 
                 TotalDividends = _db.Transactions
