@@ -6,7 +6,8 @@ using InvestmentTracker.API.Services;
 using System.Reflection;
 using InvestmentTracker.API.Infrastructure.Security;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
+using InvestmentTracker.API.Application.Transactions.Imports;
+using InvestmentTracker.API.Infrastructure.Imports.Excel;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -32,6 +33,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<TransactionsQuery>();
 builder.Services.AddScoped<DashboardSummaryQuery>();
 builder.Services.AddScoped<TransactionsHistoryQuery>();
+builder.Services.AddScoped<ExcelTransactionImportReader>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
 

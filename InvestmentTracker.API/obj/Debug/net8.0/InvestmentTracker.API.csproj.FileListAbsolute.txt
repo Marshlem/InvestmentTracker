@@ -122,3 +122,11 @@ C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\obj\Debug\n
 C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\obj\Debug\net8.0\InvestmentTracker.API.pdb
 C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\obj\Debug\net8.0\InvestmentTracker.API.genruntimeconfig.cache
 C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\obj\Debug\net8.0\ref\InvestmentTracker.API.dll
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\ClosedXML.dll
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\ClosedXML.Parser.dll
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\ExcelNumberFormat.dll
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\RBush.dll
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\SixLabors.Fonts.dll
+C:\Users\sigit\Desktop\cProjects\InvestmentApp\InvestmentTracker.API\bin\Debug\net8.0\System.IO.Packaging.dll

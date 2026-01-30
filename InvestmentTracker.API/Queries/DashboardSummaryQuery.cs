@@ -21,7 +21,6 @@ public class DashboardSummaryQuery
             .Where(t => t.UserId == userId && t.Date <= date);
 
         var invested = await tx
-            .Where(t => t.ValueChange > 0)
             .SumAsync(t => (decimal?)t.ValueChange) ?? 0;
 
         var dividends = await tx
@@ -87,7 +86,6 @@ public class DashboardSummaryQuery
                 g.Key.AssetId,
 
                 Invested = g
-                    .Where(x => x.ValueChange > 0)
                     .Sum(x => (decimal?)x.ValueChange) ?? 0,
 
                 Dividends = g.Sum(x => (decimal?)x.Dividend) ?? 0,
@@ -178,13 +176,11 @@ public class DashboardSummaryQuery
             .Where(t => t.UserId == userId)
             .AsQueryable();
 
-        // Datos ribos
         var now = DateTime.UtcNow;
         var thisMonthStart = new DateTime(now.Year, now.Month, 1);
         var prevMonthEnd = thisMonthStart.AddDays(-1);
         var prevMonthStart = new DateTime(prevMonthEnd.Year, prevMonthEnd.Month, 1);
 
-        // Praeito mėnesio paskutinė CurrentValue
         var prevMonthValues = await _db.Transactions
             .AsNoTracking()
             .Where(t =>
@@ -202,7 +198,6 @@ public class DashboardSummaryQuery
             })
             .ToDictionaryAsync(x => x.AssetId, x => x.Value);
 
-        // Einamo mėnesio dividendai
         var thisMonthDividends = await _db.Transactions
             .AsNoTracking()
             .Where(t =>
@@ -216,7 +211,6 @@ public class DashboardSummaryQuery
             })
             .ToDictionaryAsync(x => x.AssetId, x => x.Dividends);
 
-        // Pagrindinė agregacija per asset
         var perAsset = await (
             from t in tx
             join a in _db.Assets.AsNoTracking()
@@ -229,11 +223,6 @@ public class DashboardSummaryQuery
                 Name = g.Key.Name,
 
                 TotalInvested = g
-                    .Where(x => x.ValueChange > 0)
-                    .Sum(x => (decimal?)x.ValueChange) ?? 0,
-
-                TotalWithdrawn = g
-                    .Where(x => x.ValueChange < 0)
                     .Sum(x => (decimal?)x.ValueChange) ?? 0,
 
                 TotalDividends = g.Sum(x => (decimal?)x.Dividend) ?? 0,
@@ -251,9 +240,8 @@ public class DashboardSummaryQuery
         {
             var gainLoss =
                 x.LatestValue
-                - x.TotalInvested
-                + x.TotalWithdrawn
-                + x.TotalDividends;
+                + x.TotalDividends
+                - x.TotalInvested;
 
             var prevValue = prevMonthValues.TryGetValue(x.AssetId, out var pv)
                 ? pv

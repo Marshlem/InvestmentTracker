@@ -15,3 +15,18 @@ export async function getTransactionHistory(payload) {
 export async function getAssetsLookup() {
   return (await api.get('/transactions/lookup')).data
 }
+
+/* =========================
+   IMPORT
+   ========================= */
+
+export async function previewTransactionsImport(file) {
+  const form = new FormData()
+  form.append('file', file)
+
+  return (await api.post('/transactions/import/preview', form)).data
+}
+
+export async function confirmTransactionsImport(rows) {
+  return (await api.post('/transactions/import/confirm', { rows })).data
+}
